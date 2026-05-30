@@ -1,0 +1,37 @@
+[
+  {
+    "name": "invoice_number",
+    "type": "exact"
+  },
+  {
+    "name": "vendor",
+    "type": "string",
+    "threshold": 0.85
+  },
+  {
+    "name": "invoice_date",
+    "type": "date"
+  },
+  {
+    "name": "total",
+    "type": "number",
+    "abs_tol": 0.01
+  },
+  {
+    "name": "line_items",
+    "type": "table",
+    "threshold": 0.8,
+    "columns": [
+      {
+        "name": "desc",
+        "type": "string",
+        "threshold": 0.8
+      },
+      {
+        "name": "amount",
+        "type": "number",
+        "abs_tol": 0.01
+      }
+    ]
+  }
+]

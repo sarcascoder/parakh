@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+UNKNOWN.egg-info/
+.eggs/
+build/
+dist/
+# extracted sdist dirs (e.g. plumb_eval-0.1.0/) left by local builds
+plumb_eval-*/
+.pytest_cache/
+.venv/
+venv/
+
+# Plumb local data
+*.db
+plumb.db

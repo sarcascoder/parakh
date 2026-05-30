@@ -1,0 +1,40 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Run tests
+        run: pytest -q
+
+  # Example: gate a merge on extraction accuracy. Point --pred/--truth/--schema
+  # at your own files; the step fails the build if accuracy drops below target.
+  extraction-accuracy-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - name: Fail if extraction regresses
+        run: |
+          plumb eval \
+            --schema examples/invoices/schema.json \
+            --pred   examples/invoices/predictions.json \
+            --truth  examples/invoices/ground_truth.json \
+            --min-accuracy 0.20

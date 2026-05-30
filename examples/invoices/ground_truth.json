@@ -1,0 +1,58 @@
+{
+  "inv_001": {
+    "invoice_number": "A-1001",
+    "vendor": "Acme Inc.",
+    "invoice_date": "2026-01-15",
+    "total": 1200.0,
+    "line_items": [
+      {
+        "desc": "Widget",
+        "amount": 1000.0
+      },
+      {
+        "desc": "Shipping",
+        "amount": 200.0
+      }
+    ]
+  },
+  "inv_002": {
+    "invoice_number": "B-2042",
+    "vendor": "Globex LLC",
+    "invoice_date": "2026-02-03",
+    "total": 540.5,
+    "line_items": [
+      {
+        "desc": "Consulting",
+        "amount": 540.5
+      }
+    ]
+  },
+  "inv_003": {
+    "invoice_number": "C-3300",
+    "vendor": "Initech",
+    "invoice_date": "2026-03-21",
+    "total": 99.99,
+    "line_items": [
+      {
+        "desc": "License",
+        "amount": 99.99
+      }
+    ]
+  },
+  "inv_004": {
+    "invoice_number": "D-7777",
+    "vendor": "Umbrella Corp",
+    "invoice_date": "2026-04-09",
+    "total": 3150.0,
+    "line_items": [
+      {
+        "desc": "Server",
+        "amount": 3000.0
+      },
+      {
+        "desc": "Setup",
+        "amount": 150.0
+      }
+    ]
+  }
+}

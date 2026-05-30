@@ -1,0 +1,40 @@
+{
+  "inv_003": [
+    {
+      "invoice_number": "C-330",
+      "vendor": "Initrech",
+      "invoice_date": "2026-03-21",
+      "total": 99.99,
+      "line_items": [
+        {
+          "desc": "License",
+          "amount": 99.99
+        }
+      ]
+    },
+    {
+      "invoice_number": "C-3300",
+      "vendor": "Initech",
+      "invoice_date": "2026-03-21",
+      "total": 99.99,
+      "line_items": [
+        {
+          "desc": "License",
+          "amount": 99.99
+        }
+      ]
+    },
+    {
+      "invoice_number": "C-330",
+      "vendor": "Initech",
+      "invoice_date": "2026-03-21",
+      "total": 99.99,
+      "line_items": [
+        {
+          "desc": "License",
+          "amount": 99.99
+        }
+      ]
+    }
+  ]
+}
