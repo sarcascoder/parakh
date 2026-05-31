@@ -1,10 +1,10 @@
 import os
 
-from plumb.store import Store
+from parakh.store import Store
 
 
 def test_store_roundtrip_predictions_and_truth(tmp_path):
-    db = os.path.join(str(tmp_path), "plumb.db")
+    db = os.path.join(str(tmp_path), "parakh.db")
     s = Store(db)
     try:
         s.add_document("inv_001", "invoices/inv_001.pdf")

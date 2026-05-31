@@ -1,4 +1,4 @@
-"""End-to-end Plumb demo — runs on CPU, no model required.
+"""End-to-end Parakh demo — runs on CPU, no model required.
 
 Simulates extracting structured data from 4 invoices with a local model, then:
   1. scores field-level accuracy vs ground truth,
@@ -9,11 +9,11 @@ Run:  python -m examples.invoices.run_demo   (from the repo root)
 """
 from __future__ import annotations
 
-from plumb import (
+from parakh import (
     FieldSpec, FieldType, evaluate, consensus_extraction,
     reliability_table, safe_auto_accept_threshold, score_document,
 )
-from plumb.report import text_report
+from parakh.report import text_report
 
 # --- Schema ---------------------------------------------------------------- #
 SCHEMA = [

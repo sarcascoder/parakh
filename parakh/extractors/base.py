@@ -1,6 +1,6 @@
 """Extractor adapter interface.
 
-Plumb does not do extraction itself — it measures and corrects whatever
+Parakh does not do extraction itself — it measures and corrects whatever
 extractor you already use. Adapters wrap any source of `dict` predictions:
 a local VLM via an OpenAI-compatible endpoint, Docling/Marker output, or a
 fixed set of pre-computed predictions for offline evaluation.

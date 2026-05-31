@@ -1,4 +1,4 @@
-"""Adapters that plug existing extractors into Plumb.
+"""Adapters that plug existing extractors into Parakh.
 
 `MappingExtractor` adapts ANY extractor that already produced a dict: you give
 it pre-computed output keyed by doc id, plus an optional key-rename map so its
@@ -6,7 +6,7 @@ field names line up with your schema. This is how you evaluate Docling / Marker
 / LlamaParse output without re-running them.
 
 `DoclingExtractor` calls IBM Docling live if it's installed; it imports lazily
-so Plumb's core stays dependency-free.
+so Parakh's core stays dependency-free.
 """
 from __future__ import annotations
 

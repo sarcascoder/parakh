@@ -5,16 +5,16 @@ import threading
 import urllib.request
 from http.server import HTTPServer
 
-from plumb.metrics import FieldSpec, FieldType
-from plumb.review import ReviewApp, make_handler
-from plumb.store import Store
+from parakh.metrics import FieldSpec, FieldType
+from parakh.review import ReviewApp, make_handler
+from parakh.store import Store
 
 SPECS = [FieldSpec("invoice_number", FieldType.EXACT),
          FieldSpec("total", FieldType.NUMBER, abs_tol=0.01)]
 
 
 def _make_app(tmp_path) -> ReviewApp:
-    store = Store(os.path.join(str(tmp_path), "plumb.db"))
+    store = Store(os.path.join(str(tmp_path), "parakh.db"))
     preds = {"d1": {"invoice_number": "A-1", "total": 100}}
     samples = {"d1": [
         {"invoice_number": "A-1", "total": 100},

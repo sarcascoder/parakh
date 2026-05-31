@@ -1,4 +1,4 @@
-from plumb.metrics import FieldSpec, FieldType, evaluate, score_field
+from parakh.metrics import FieldSpec, FieldType, evaluate, score_field
 
 
 def test_exact_match_normalizes_case_and_space():

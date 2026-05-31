@@ -1,7 +1,7 @@
-"""Plumb — self-hosted accuracy evals + correction loop for document extraction.
+"""Parakh — self-hosted accuracy evals + correction loop for document extraction.
 
 Model-agnostic. Bring your own extractor (local VLM, Docling, Marker, an API).
-Plumb measures field-level accuracy, derives calibrated confidence, and turns
+Parakh measures field-level accuracy, derives calibrated confidence, and turns
 human corrections into ground truth + few-shot examples — all on your machine.
 """
 from .metrics import (

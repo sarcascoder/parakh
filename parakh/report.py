@@ -14,7 +14,7 @@ def _bar(score: float, width: int = 20) -> str:
 def text_report(report: DatasetReport) -> str:
     lines: List[str] = []
     lines.append("=" * 56)
-    lines.append("  PLUMB EXTRACTION REPORT")
+    lines.append("  PARAKH EXTRACTION REPORT")
     lines.append("=" * 56)
     lines.append(f"  Documents evaluated : {len(report.docs)}")
     lines.append(f"  Document accuracy   : {report.document_accuracy:.1%}  "
@@ -35,7 +35,7 @@ def text_report(report: DatasetReport) -> str:
 
 def markdown_report(report: DatasetReport) -> str:
     md: List[str] = []
-    md.append("# Plumb Extraction Report\n")
+    md.append("# Parakh Extraction Report\n")
     md.append(f"- **Documents evaluated:** {len(report.docs)}")
     md.append(f"- **Document accuracy (100% correct):** {report.document_accuracy:.1%}")
     md.append(f"- **Mean field score:** {report.mean_field_score:.1%}\n")

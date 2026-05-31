@@ -1,7 +1,7 @@
 """Calibrated confidence — without trusting the model's self-report.
 
 Research is consistent that LLM self-reported confidence is poorly calibrated
-("overconfident regardless of prompting strategy"). Plumb instead derives
+("overconfident regardless of prompting strategy"). Parakh instead derives
 confidence from signals that actually correlate with correctness:
 
 1. Self-consistency: run the extractor N times (temperature > 0) and measure

@@ -1,4 +1,4 @@
-from plumb.fewshot import build_examples, render_block, examples_covering_fields
+from parakh.fewshot import build_examples, render_block, examples_covering_fields
 
 
 GT = {

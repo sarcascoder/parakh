@@ -33,7 +33,7 @@ jobs:
       - run: pip install -e .
       - name: Fail if extraction regresses
         run: |
-          plumb eval \
+          parakh eval \
             --schema examples/invoices/schema.json \
             --pred   examples/invoices/predictions.json \
             --truth  examples/invoices/ground_truth.json \

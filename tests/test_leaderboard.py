@@ -1,5 +1,5 @@
-from plumb.metrics import FieldSpec, FieldType
-from plumb.leaderboard import compare_models
+from parakh.metrics import FieldSpec, FieldType
+from parakh.leaderboard import compare_models
 
 SPECS = [FieldSpec("a", FieldType.EXACT), FieldSpec("b", FieldType.EXACT)]
 GT = {"d1": {"a": "x", "b": "y"}, "d2": {"a": "x", "b": "y"}}

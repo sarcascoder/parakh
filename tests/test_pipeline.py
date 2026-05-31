@@ -1,8 +1,8 @@
 """Pipeline facade: the end-to-end flow people drop into their own code."""
 import os
 
-from plumb import Pipeline, FieldSpec, FieldType
-from plumb.extractors import FixedExtractor
+from parakh import Pipeline, FieldSpec, FieldType
+from parakh.extractors import FixedExtractor
 
 
 SCHEMA = [

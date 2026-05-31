@@ -109,14 +109,14 @@ def serve(app: ReviewApp, host: str = "127.0.0.1", port: int = 8000) -> None:  #
     from http.server import HTTPServer
 
     httpd = HTTPServer((host, port), make_handler(app))
-    print(f"Plumb review UI → http://{host}:{port}  (Ctrl-C to stop)")
+    print(f"Parakh review UI → http://{host}:{port}  (Ctrl-C to stop)")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         httpd.server_close()
 
 
-_PAGE = """<!doctype html><html><head><meta charset="utf-8"><title>Plumb Review</title>
+_PAGE = """<!doctype html><html><head><meta charset="utf-8"><title>Parakh Review</title>
 <style>
  body{font:14px/1.5 system-ui,sans-serif;margin:0;background:#0f1115;color:#e6e6e6}
  header{padding:16px 24px;background:#161922;border-bottom:1px solid #262b36}
@@ -133,7 +133,7 @@ _PAGE = """<!doctype html><html><head><meta charset="utf-8"><title>Plumb Review<
  button{background:#3b82f6;color:#fff;border:0;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px}
  .ok{color:#46c46a;margin-left:10px} .empty{color:#8a93a6;text-align:center;padding:40px}
 </style></head><body>
-<header><h1>Plumb — review queue <span>· corrections saved as ground truth, locally</span></h1></header>
+<header><h1>Parakh — review queue <span>· corrections saved as ground truth, locally</span></h1></header>
 <main id="app"><p class="empty">Loading…</p></main>
 <script>
 async function load(){

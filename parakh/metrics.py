@@ -1,4 +1,4 @@
-"""Field-level extraction metrics — the core of Plumb.
+"""Field-level extraction metrics — the core of Parakh.
 
 Given a predicted extraction and a ground-truth extraction (both plain dicts
 following a schema), compute per-field correctness using a comparison strategy

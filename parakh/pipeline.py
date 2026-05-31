@@ -2,13 +2,13 @@
 
 Wraps an extractor + schema + local store so a real pipeline is a few lines:
 
-    from plumb import Pipeline, FieldSpec, FieldType
-    from plumb.extractors import OpenAICompatExtractor
+    from parakh import Pipeline, FieldSpec, FieldType
+    from parakh.extractors import OpenAICompatExtractor
 
     pipe = Pipeline(
         schema=[FieldSpec("total", FieldType.NUMBER), ...],
         extractor=OpenAICompatExtractor(model="qwen2.5-vl"),
-        store_path="plumb.db",
+        store_path="parakh.db",
         consistency_runs=3,          # >1 enables self-consistency confidence
     )
 
@@ -39,7 +39,7 @@ from .store import Store
 class Pipeline:
     schema: Sequence[FieldSpec]
     extractor: Extractor
-    store_path: str = "plumb.db"
+    store_path: str = "parakh.db"
     consistency_runs: int = 1
     confidence_threshold: float = 0.99
 

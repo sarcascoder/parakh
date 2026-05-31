@@ -35,7 +35,7 @@ class OpenAICompatExtractor:
         self.api_key = api_key
         self.temperature = temperature
         self.name = name or model
-        # Inject verified examples from the correction loop (see plumb.fewshot).
+        # Inject verified examples from the correction loop (see parakh.fewshot).
         self.few_shot_block = few_shot_block
 
     def extract(self, document: str, specs: Sequence[FieldSpec]) -> Dict:

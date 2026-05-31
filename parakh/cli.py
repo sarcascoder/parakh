@@ -1,7 +1,7 @@
-"""Plumb CLI.
+"""Parakh CLI.
 
-    plumb eval  --pred predictions.json --truth ground_truth.json --schema schema.json
-    plumb demo
+    parakh eval  --pred predictions.json --truth ground_truth.json --schema schema.json
+    parakh demo
 
 Schema JSON format (list of field specs):
     [
@@ -101,7 +101,7 @@ def _cmd_review(args: argparse.Namespace) -> int:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="plumb", description=__doc__,
+    p = argparse.ArgumentParser(prog="parakh", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
 
@@ -123,7 +123,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     pr.add_argument("--samples", help="optional {doc_id: [pred,...]} for confidence")
     pr.add_argument("--host", default="127.0.0.1")
     pr.add_argument("--port", type=int, default=8000)
-    pr.add_argument("--db", default="plumb.db")
+    pr.add_argument("--db", default="parakh.db")
     pr.set_defaults(func=_cmd_review)
 
     args = p.parse_args(argv)

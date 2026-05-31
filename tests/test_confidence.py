@@ -1,5 +1,5 @@
-from plumb.metrics import FieldSpec, FieldType
-from plumb.confidence import (
+from parakh.metrics import FieldSpec, FieldType
+from parakh.confidence import (
     consensus_extraction, field_consistency,
     reliability_table, safe_auto_accept_threshold,
 )

@@ -8,11 +8,11 @@ cd "$(dirname "$0")"
 PY=python3
 command -v $PY >/dev/null 2>&1 || PY=python
 
-echo "==> Plumb demo (offline, no model needed)"
+echo "==> Parakh demo (offline, no model needed)"
 PYTHONPATH=. $PY -m examples.invoices.run_demo
 
 if [ "$1" != "demo" ]; then
   echo ""
   echo "==> Starting review UI at http://127.0.0.1:8000  (press Ctrl-C to stop)"
-  PYTHONPATH=. $PY -m plumb.cli review
+  PYTHONPATH=. $PY -m parakh.cli review
 fi

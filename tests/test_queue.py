@@ -1,5 +1,5 @@
-from plumb.metrics import FieldSpec, FieldType
-from plumb.queue import build_review_queue
+from parakh.metrics import FieldSpec, FieldType
+from parakh.queue import build_review_queue
 
 SPECS = [
     FieldSpec("invoice_number", FieldType.EXACT),

@@ -6,12 +6,12 @@ UNKNOWN.egg-info/
 .eggs/
 build/
 dist/
-# extracted sdist dirs (e.g. plumb_eval-0.1.0/) left by local builds
-plumb_eval-*/
+# extracted sdist dirs (e.g. parakh-0.1.0/) left by local builds
+parakh-*/
 .pytest_cache/
 .venv/
 venv/
 
-# Plumb local data
+# Parakh local data
 *.db
-plumb.db
+parakh.db
