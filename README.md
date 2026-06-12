@@ -1,169 +1,96 @@
-# Parakh
+# parakh
 
-**Self-hosted accuracy evals + a correction loop for document extraction. Bring your own model.**
+**Self-hosted, bring-your-own-model OCR & extraction evaluation — with human-in-the-loop correction and CI gates.**
 
-You moved document extraction in-house — onto a local VLM, Docling, Marker, or your own pipeline on vLLM/Ollama — because it's ~167× cheaper per page than cloud APIs and your documents can't leave the building. But the moment you self-host, you lose the one thing the managed APIs quietly gave you: **confidence that the output is actually correct.**
+> *parakh (परख)* — Hindi for *test, scrutinise, judge.* What your evals should actually do.
 
-Parakh is a small, code-first layer that **measures** how good your extraction is, field by field, and gives you a **correction loop** that turns human fixes into ground truth and few-shot examples. Everything runs locally. Nothing leaves your machine. The core has **zero dependencies**.
-
-> Parakh is *complementary* to extractors, not a competitor. Point it at whatever you already use.
-
-### Where Parakh fits (honest positioning)
-
-If you want a full intelligent-document-processing **platform** — workflow builder, hosted review, connectors — use [Unstract](https://unstract.com) (open source) or commercial tools like Extend / Rossum / Nanonets. They are mature and excellent.
-
-Parakh is deliberately the opposite: a **tiny library + CLI** you `import`, not a platform you adopt. Reach for it when you want document-aware accuracy metrics (table row/cell F1, currency/date/fuzzy normalization) and a confidence + review loop **as code, in your repo, in CI** — without standing up a whole platform. Generic LLM-eval libraries (`deepeval`, `pydantic-evals`) don't specialize in document field extraction; the IDP platforms aren't a `pip install` you wire into a pytest. Parakh sits in that gap.
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/parakh.svg)](https://pypi.org/project/parakh/)
 
 ---
 
-## Why this exists
+## The problem
 
-- Extractors (Docling, Marker, Unstract, LlamaParse) are excellent and commoditized. The hard part is no longer getting JSON out — it's **knowing the JSON is right.**
-- Prompt-eval tools (promptfoo, deepeval) are built for chat/RAG, not document field extraction (currency, dates, multi-row line-item tables), and have no built-in human review.
-- Model self-reported confidence is unreliable — LLMs are overconfident regardless of prompting. Parakh derives confidence from signals that actually correlate with correctness.
+You shipped OCR / VLM / document extraction to production. Now what?
 
-## What it does
+- Accuracy numbers from the model vendor are on **their** benchmark, not your corpus.
+- Your "evaluation" is three engineers hand-checking 20 documents on Friday.
+- When the model drifts or the vendor pushes an update, you find out from a customer.
+- "Field-level accuracy" means different things to different teams; nobody agrees on a number.
 
-1. **Field-level metrics** — type-aware comparison so formatting noise doesn't count as error:
-   - `exact` (ids/codes), `number` (currency + tolerance), `date` (format-invariant), `string` (fuzzy + threshold), `table` (row alignment → precision/recall/F1 on line items).
-2. **Calibrated confidence** — self-consistency across repeated runs flags exactly which fields a human should review; a reliability table + **safe auto-accept threshold** tells you where you can stop reviewing.
-3. **Correction loop** — corrections are stored locally (SQLite) and become both ground truth for future evals and few-shot examples for the extractor.
-4. **CI gate** — `parakh eval --min-accuracy 0.95` exits non-zero, so an extraction regression fails your build.
+parakh fixes this. **It is the evaluation framework I built because I needed one and the alternatives were either toy benchmarks or $40K enterprise platforms.**
 
-## Quickstart
+---
 
-```bash
-./run.sh          # macOS/Linux: demo + review UI   (run.bat on Windows)
-# or, manually:
-python -m examples.invoices.run_demo
-```
+## What parakh does
 
-```python
-from parakh import FieldSpec, FieldType, evaluate
-from parakh.report import text_report
+- **Field-level metrics** — character-level accuracy, exact match, fuzzy match, IoU on bounding boxes, all per-field. Not a single hallucinated F1.
+- **Confidence calibration** — flag low-confidence predictions for human review; track whether the model's confidence actually correlates with correctness over time.
+- **Human correction loop** — annotate, correct, save back to a golden set. The golden set is the only asset that compounds.
+- **CI gate** — a single command. Fails your PR if accuracy regresses past a threshold you set.
+- **BYO-model** — all major OCR engines and the leading open-source vision-language models, plus your own. Adapter pattern, ~30 lines per new model.
+- **Self-hosted** — your data never leaves your infra.
 
-schema = [
-    FieldSpec("invoice_number", FieldType.EXACT),
-    FieldSpec("vendor",         FieldType.STRING, threshold=0.85),
-    FieldSpec("invoice_date",   FieldType.DATE),
-    FieldSpec("total",          FieldType.NUMBER, abs_tol=0.01),
-    FieldSpec("line_items",     FieldType.TABLE, columns=(
-        FieldSpec("desc",   FieldType.STRING),
-        FieldSpec("amount", FieldType.NUMBER),
-    )),
-]
+---
 
-predictions  = {"inv_001": {"invoice_number": "A-1001", "vendor": "ACME, Inc",
-                            "invoice_date": "01/15/2026", "total": "$1,200.00", ...}}
-ground_truth = {"inv_001": {"invoice_number": "A-1001", "vendor": "Acme Inc.",
-                            "invoice_date": "2026-01-15", "total": 1200.00, ...}}
-
-print(text_report(evaluate(schema, predictions, ground_truth)))
-```
-
-### Bring your own model
-
-```python
-from parakh.extractors import OpenAICompatExtractor
-
-# works with Ollama, vLLM, llama.cpp server, or your RunPod endpoint
-extractor = OpenAICompatExtractor(base_url="http://localhost:11434/v1",
-                                  model="qwen2.5-vl")
-prediction = extractor.extract(document_text, schema)
-```
-
-### Use it in your pipeline (the `Pipeline` facade)
-
-One object wires extractor + schema + a local store together. This is the
-intended integration point:
-
-```python
-from parakh import Pipeline, FieldSpec, FieldType
-from parakh.extractors import OpenAICompatExtractor
-
-pipe = Pipeline(
-    schema=[FieldSpec("invoice_number", FieldType.EXACT),
-            FieldSpec("total", FieldType.NUMBER, abs_tol=0.01)],
-    extractor=OpenAICompatExtractor(model="qwen2.5-vl", temperature=0.3),
-    store_path="parakh.db",
-    consistency_runs=3,            # >1 → self-consistency confidence per field
-)
-
-pipe.extract("inv_001", document_text)     # run model, store prediction(s)
-for item in pipe.review_queue():           # worst-first: what a human should check
-    print(item.doc_id, [f.name for f in item.fields if f.reason])
-
-pipe.record_correction("inv_001", {"total": 1200.00})   # → ground truth + few-shot
-report = pipe.evaluate()                   # field-level accuracy vs your corrections
-block  = pipe.fewshot_block({"inv_001": document_text})  # prime the next extraction
-```
-
-Drop `report.document_accuracy` into an assert and you have a regression gate in
-your own test suite.
-
-### CLI
+## Quick start
 
 ```bash
-# score predictions against ground truth (exit 1 if below target → CI gate)
-parakh eval --pred preds.json --truth truth.json --schema schema.json --min-accuracy 0.95
-
-# open the review UI on your own data (omit flags to use the bundled demo)
-parakh review --schema schema.json --pred preds.json --samples samples.json
+pip install parakh
+parakh init my-eval/
+# put your documents in my-eval/inputs/
+# put your golden outputs in my-eval/golden/
+parakh eval --model your-vlm --config my-eval/config.yaml
+parakh dashboard  # local web UI for review + correction
 ```
 
-### Continuous integration
+CI gate:
 
-`parakh eval --min-accuracy` returns a non-zero exit code when accuracy drops,
-so a regression fails the build. A ready-to-edit GitHub Actions workflow lives at
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) — point it at your own
-`schema.json` / `predictions.json` / `ground_truth.json` and set your threshold.
-
-## Architecture
-
-```
-your extractor ──► predictions ─┐
-                                 ├─► parakh.metrics  ─► per-field accuracy, weakest fields
-ground truth (humans) ──────────┘     parakh.confidence ─► review queue, auto-accept threshold
-                                       parakh.store    ─► local SQLite, corrections feed back
+```yaml
+# .github/workflows/eval.yml
+- uses: sarcascoder/parakh-action@v1
+  with:
+    model: your-vlm
+    threshold: 0.92  # fails PR if accuracy drops below
 ```
 
-- **Core: pure Python stdlib.** No GPU, no always-on service, no data egress.
-- **Adapters** wrap any extractor. Cloud or local — Parakh doesn't care.
-- **Review UI**: zero-dependency, built on the stdlib `http.server`. No FastAPI required.
+---
 
-### Review UI
+## What's coming (paid)
 
-```bash
-parakh review              # opens the local review queue at http://127.0.0.1:8000
-```
+The OSS version is intentionally complete for single-team self-hosted use. For everything beyond that:
 
-Worst-first queue, each field annotated with *why* it's flagged (disagrees with
-ground truth, or low self-consistency confidence). Edit, click **Save as ground
-truth** — the correction is written locally and feeds future evals.
+**parakh Cloud** *(early access, [join waitlist →](https://parakh.cloud))*
 
-### Model leaderboard (on your documents)
+- Hosted dashboard, history, dataset versioning
+- Multi-team RBAC + audit log
+- Side-by-side model comparison across versions
+- Slack/email alerts on regression
+- SOC 2-friendly architecture, EU + US data residency
+- Pricing: $99 / $499 / $1,499 per month
 
-```python
-from parakh import compare_models, leaderboard_text
-lb = compare_models(schema, ground_truth, {"qwen2.5-vl": preds_a, "granite-docling": preds_b})
-print(leaderboard_text(lb))   # ranks models AND picks the best model per field
-```
+If you're hand-rolling evals or paying enterprise prices for less, get on the list.
 
-## Roadmap
+---
 
-- [x] Field-level metrics engine (exact / number / date / string / table)
-- [x] Self-consistency confidence + reliability table + safe auto-accept threshold
-- [x] Local SQLite store with correction write-back
-- [x] OpenAI-compatible extractor adapter (Ollama / vLLM / RunPod)
-- [x] CLI with CI gate
-- [x] Web review UI (document view + field correction) — stdlib, zero deps
-- [x] Docling adapter + generic mapping adapter (evaluate any extractor's output)
-- [x] Model/prompt leaderboard on *your* documents (best model per field)
-- [x] Few-shot example export from corrections (`parakh.fewshot`) — feeds verified
-      fixes back into the extractor prompt; accuracy compounds as you review
-- [ ] Side-by-side document image viewer in the review UI
-- [ ] Marker adapter + a published PyPI release
+## What this is not
+
+- **Not a labelling tool.** Use Label Studio for that. parakh consumes your golden set; it doesn't help you create it from zero.
+- **Not a training framework.** parakh evaluates. Train wherever you train.
+- **Not opinionated about your stack.** Adapters for everything I use in production, easy to add more.
+
+---
+
+## Used in production by
+
+Hashteelab (manufacturing, automotive, cement, legal clients) — and counting.
+
+## Works hand-in-hand with [OpenExtract](https://github.com/sarcascoder/openextract)
+
+If you're using [OpenExtract](https://github.com/sarcascoder/openextract) (or any self-hosted Textract / Azure DocInt / Google Doc AI alternative), parakh is the eval framework that proves it works on *your* corpus. Same author. Same family.
 
 ## License
 
-Apache-2.0. Core is and stays open source.
+Apache-2.0 for the OSS. parakh Cloud is a separate hosted commercial service.
+
+📧 **tanupam760@gmail.com** · [GitHub](https://github.com/sarcascoder) · [parakh.cloud](https://parakh.cloud)
